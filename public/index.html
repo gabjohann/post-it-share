@@ -5,20 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" href="style.css" />
+    <script src="./htmx.min.js"></script>
     <title>Post-it Share</title>
   </head>
   <body>
     <div class="sticky-note">
-      <div class="content" contenteditable="true"></div>
-      <button>Compartilhar</button>
+      <div
+        id="content"
+        class="content"
+        contenteditable="true"
+        oninput="document.getElementById('share-button').disabled = !this.textContent.trim()"
+      ></div>
+
+      <button
+        id="share-button"
+        disabled="true"
+        hx-trigger="click"
+        hx-post="/notes"
+        hx-target="#share-link"
+        hx-on:htmx:config-request="event.detail.parameters.content = content.innerHTML"
+        hx-on:htmx:after-request="{
+          document.getElementById('share-button').disabled = true;
+          document.getElementById('content').innerHTML = '';
+        }"
+      >
+        Compartilhar
+      </button>
     </div>
 
-    <div id="share-link">
-      <p>
-        Compartilhe sua nota através do link
-        <br />
-        <span>http://localhost:3000/note/349349</span>
-      </p>
-    </div>
+    <div id="share-link"></div>
   </body>
+
+  <script src="https://cdn.jsdelivr.net/gh/noumanqamar450/alertbox@main/version/1.0.2/alertbox.min.js"></script>
+  <script>
+    function handleCopyLink() {
+      const linkText = document.getElementById("link").textContent;
+
+      navigator.clipboard
+        .writeText(linkText)
+        .then(() => {
+          alertbox.render({
+            alertIcon: "success",
+            title: "Sucesso",
+            message: "Link copiado para a sua área de transferência!",
+            btnTitle: "Ok",
+            border: false,
+            themeColor: "#57A9ED",
+          });
+        })
+        .catch((err) => {
+          console.error("Erro ao copiar o link: ", err);
+          alert("Falha ao copiar o link. Tente novamente.");
+        });
+    }
+  </script>
 </html>

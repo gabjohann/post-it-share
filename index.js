@@ -31,11 +31,37 @@ app.post("/notes", async (req, res) => {
   const id = crypto.randomUUID();
   await saveNote(id, content);
   res.send(`
-    <p>Compartilhe sua nota através do link
-      <br />
-      <span>${req.headers.origin}/note/${id}</span>
-    </p>
-    `);
+   <div class="content">
+        <p>Compartilhe sua nota através do link</p>
+        <div class="link-container">
+          <span id="link">${req.headers.origin}/note/${id}</span>
+          <button id="copy-btn" onclick="handleCopyLink()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+              <rect width="256" height="256" fill="none" />
+              <polyline
+                points="168 168 216 168 216 40 88 40 88 88"
+                fill="none"
+                stroke="#333"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+              <rect
+                x="40"
+                y="88"
+                width="128"
+                height="128"
+                fill="none"
+                stroke="#333"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+  `);
 });
 
 app.get("/share/:id", async (req, res) => {
