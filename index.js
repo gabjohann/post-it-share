@@ -1,5 +1,11 @@
 const express = require("express");
-const { saveNote } = require("./db");
+const {
+  saveNote,
+  deleteExpiredNotes,
+  getNote,
+  markNoteAsOpened,
+} = require("./db");
+
 const app = express();
 
 const port = 3000;
@@ -30,6 +36,25 @@ app.post("/notes", async (req, res) => {
       <span>${req.headers.origin}/note/${id}</span>
     </p>
     `);
+});
+
+app.get("/share/:id", async (req, res) => {
+  await deleteExpiredNotes();
+
+  const { id } = req.params;
+  const note = await getNote(id);
+
+  if (!note) {
+    return res.sendFile(
+      '<span class="error">Esta nota não existe mais!</span>'
+    );
+  }
+
+  if (!note.opened_at) {
+    await markNoteAsOpened(id);
+  }
+
+  res.send(note.content);
 });
 
 app.listen(port, () => {
